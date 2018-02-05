@@ -1,9 +1,9 @@
 from riotwatcher import RiotWatcher
+import time
+import json
+watcher = RiotWatcher('RGAPI-b17a8469-7cf1-4f9d-bbd7-e244a4225b92')
 
-
-watcher = RiotWatcher('RGAPI-85a0a75d-7685-4cf4-9494-71673a0880ee')
-
-my_region = 'na1'
+my_region = 'jp1'
 '''
 me = watcher.summoner.by_name(my_region, 'test')
 print(me)
@@ -32,9 +32,31 @@ from requests import HTTPError
 # The 429 status code indicates that the user has sent too many requests
 # in a given amount of time ("rate limiting").
 
-nameList = ['test','test1','test2','test3']
-for summoner_name in nameList:
+start_time = time.time()
+data = {}  
+data['matches'] = []
+i=1
+while 1:
     try:
-        response = watcher.summoner.by_name(my_region, summoner_name)
-    except Exception as err:
-        print(err)
+        response = watcher.match.by_id(my_region, i+99)
+        print(response)
+        data['summoner'].append(response)
+        with open('match.json' , 'w', encoding='utf-8') as f:
+            f.write(json.dumps(data, ensure_ascii=False))
+    except HTTPError as err:
+        if err.response.status_code == 403:
+            print('API Key is invalid or has expired')
+            break
+        else:
+            print(err)
+        '''
+    #for rate limit being 100 request per 2 minutes
+    if i % 100 == 0:
+        time_now = time.time()
+        time.sleep(120 -(time_now - start_time))
+        start_time = time_now
+    # for rate limit being 20 request per second
+    '''
+    i += 1
+    
+
