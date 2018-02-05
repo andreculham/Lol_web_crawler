@@ -1,0 +1,45 @@
+{% load static %}
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}" />
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form method="post" action="/">
+{% csrf_token %}
+Region:<select name="platformId">
+		{% for region in regions %}
+		<option value="{{ region }}" {% if region == selected %} selected {% endif %}>{{ region }}</option>
+		{% endfor %}
+	</select>
+Thread name:<input type="text" id="threadName" name="threadName">
+Object type: <select name="objType">
+		{% for type in objTypes %}
+		<option value="{{ type }}">{{ type }} </option>
+		{% endfor %}
+	</select>
+	<input type="submit" name="add" class="btn" value="ADD thread">
+</form>
+<form method="post" action="/">
+{% csrf_token %}
+<table>
+        <tr>
+            <th>No</th>
+			<th> Thread name </th>
+            <th>Region</th>
+            <th>Object name</th>
+        </tr>
+        {% for item in obj_list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.region }}</td>
+			<td>{{ item.objType }} </td>
+			<td> <input type="submit" name="remove" class="btn" value="Stop{{ forloop.counter }}"></td>
+        </tr>
+        {% endfor %}
+ </table>
+ </form>

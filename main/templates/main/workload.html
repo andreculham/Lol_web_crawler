@@ -1,0 +1,24 @@
+{% if total_match_len %}
+	Total number of matches = {{ total_match_len }}
+{% endif %}
+<form method="post" action="/workload/">
+{% csrf_token %}
+From:<input type="datetime-local" id="startTime" name="startTime" placeholder="Start Time">
+To:<input type="datetime-local" id="endTime" name="endTime" placeholder="End Time">
+<input type="submit" class="btn" value="Filter">
+</form>
+{% if match_list %}
+	{{ match_list|length }} Matches :
+	<ul>
+	{% for match in match_list %}
+		<li> Match id : {{ match.gameId }} <br />
+			 Number of players : {{ match.participantIdentities }}<br />
+			 Timestamp : {{ match.gameCreation }} <br />
+			 Game Duration : {{ match.gameDuration }} <br />
+		</li>
+	{% endfor %}
+	</ul>
+{% else %}
+	Matches :
+	<p> No matches found. </p>
+{% endif %}
