@@ -124,4 +124,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/main/static/main/"
+TEMPLATE_DIRS = [
+    os.path.join(BASE_DIR, "Lol_web_crawler\\main\\templates\\main"),
+]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "Lol_web_crawler\\main\\static\\main"),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'main')

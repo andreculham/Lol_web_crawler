@@ -20,8 +20,9 @@ class MainConfig(AppConfig):
         t2.daemon= True
         t.start()
         t2.start()
-        #t.event.set()  //stopping the thread
-
+        #t.event.set()  #stopping the thread
+        #t2.event.set()
+    
     
     
 
