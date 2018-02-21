@@ -2,13 +2,14 @@ import time
 import json
 from django.http import HttpResponse
 from django.template import loader
-from .models import Match
+from .models import Match, SummonerDTO
 from riotwatcher import RiotWatcher
 from django.core import serializers
 from requests import HTTPError
 import threading
 from main.apicaller import ApiCaller
 import gc
+import main.summoner
 
 class Dynamic(object):
     pass
@@ -69,6 +70,72 @@ def workload(request):
         }
     return HttpResponse(template.render(context, request))
 
+def home(request):
+    template = loader.get_template('main/search.html')
+    context={
+        }
+    return HttpResponse(template.render(context, request))
+def search(request, search_value):
+    print("############# Searching........ #############")
+    search_value = search_value.replace("%20", " ")
+    #summoner_info = models.search_by_name(search_value)
+    #summoner_info = SummonerDTO.objects.filter(name=search_value)
+    summoner_info = main.summoner.search_by_name(search_value)
+    print("############# Return Summoner Info #############")
+    print(summoner_info)
+    match_list = []
+    #client = MongoClient()
+    #chamList = client.test
+    for match in summoner_info['matchlist']['matches']:
+        participantId = [participant['participantId'] for participant in match['detail']['participantIdentities'] if
+                         participant['player']['summonerName'] == summoner_info['name']][0]
+        participant = [participant for participant in match['detail']['participants'] if
+                       participant['participantId'] == participantId][0]
+        itemkeys = ['item0','item1','item2','item3','item4','item5','item6']
+        items = [participant['stats'][key] for key in itemkeys]
+        doublekill = participant['stats']['doubleKills'] > 0
+        triplekill = participant['stats']['tripleKills'] > 0
+        quadrakill = participant['stats']['quadraKills'] > 0
+        pentakill = participant['stats']['pentaKills'] > 0
+        cId = participant['championId']
+        game_type = match['detail']['gameMode']
+        #cursor = chamList.champions.find({'id':cId})
+        #champion = [doc['key'] for doc in cursor][0]
+        champion = ''
+        match_list.append({'champion': champion,
+                           'kills': participant['stats']['kills'],
+                           'deaths': participant['stats']['deaths'],
+                           'assists': participant['stats']['assists'],
+                           'win': participant['stats']['win'],
+                           'level': participant['stats']['champLevel'],
+                           'items': items,
+                           'penta': pentakill,
+                           'quadra': quadrakill,
+                           'triple': triplekill,
+                           'double': doublekill,
+                           'gameType':game_type,
+                           'match': match})
+        #print(match)
+    losses = summoner_info['league']['losses']
+    wins = summoner_info['league']['wins']
+    if losses == 0:
+        if wins == 0: rate = 0
+        else: rate = 100
+    else:
+        rate = round(float(wins)/float(wins+losses)*100, 2)
+    template = loader.get_template('main/search.html')
+    context = {'search_value':search_value,
+            'summoner_info': summoner_info,
+            'name': summoner_info['name'],
+            'icon': summoner_info['profileIconId'],
+            'league': summoner_info['league']['league'],
+            'points': summoner_info['league']['points'],
+            'level': summoner_info['summonerLevel'],
+            'wins': wins,
+            'losses': losses,
+            'rate': rate,
+            'match_list': match_list}
+    return HttpResponse(template.render(context, request))
 
 def api_caller(latest_match_id):    
     watcher = RiotWatcher('RGAPI-a8c42df2-8906-410f-b185-4af067244a93')

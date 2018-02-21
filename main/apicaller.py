@@ -20,9 +20,9 @@ class ApiCaller(threading.Thread):
         self.objType = obj.objType
         self.event = threading.Event()
     def run(self):
-        watcher = RiotWatcher('RGAPI-7afd81fc-d6ed-4584-8113-000b8080830c')
+        watcher = RiotWatcher('RGAPI-037a581d-1a62-4dc6-9040-f6de10e853bf')
         region = self.region
-        i= 35129421203
+        i= 2585564750
         while not self.event.is_set():
             logging.debug('Waiting for a lock')
             self.lock.acquire()
