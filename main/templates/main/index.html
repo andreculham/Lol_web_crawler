@@ -6,8 +6,9 @@ table, th, td {
 </style>
 <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}" />
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<a href="/search/"> <button>search</button> </a>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form method="post" action="/">
 {% csrf_token %}
 Region:<select name="platformId">

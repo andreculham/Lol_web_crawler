@@ -3,12 +3,17 @@ import json
 from django.http import HttpResponse
 from django.template import loader
 from .models import Match
+from .models import SummonerDTO
+from .models import ChampionMasteryDTO
+from .models import ChampionDto
 from riotwatcher import RiotWatcher
 from django.core import serializers
 from requests import HTTPError
 import threading
 from main.apicaller import ApiCaller
 import gc
+from django.shortcuts import render
+
 
 class Dynamic(object):
     pass
@@ -71,7 +76,7 @@ def workload(request):
 
 
 def api_caller(latest_match_id):    
-    watcher = RiotWatcher('RGAPI-a8c42df2-8906-410f-b185-4af067244a93')
+    watcher = RiotWatcher('RGAPI-bdf0d7e8-4bfe-4386-983e-78ba3767e454')
     region = 'jp1'
     i= latest_match_id
     while 1:
@@ -94,3 +99,158 @@ def api_caller(latest_match_id):
                 print(err)
         i += 1
     
+def search(request, search_value):
+    ## search in database
+    watcher = RiotWatcher('RGAPI-bdf0d7e8-4bfe-4386-983e-78ba3767e454')
+    region = 'na1'
+
+    # sudo code
+
+    # summoner_info = SummonerDTO where name matches search_value
+
+
+    # league info
+
+    # summoner_league = 'Unranked'
+    # points = 0
+    # wins = 0
+    # losses = 0
+    # try_league = watcher.league.positions_by_summoner(region, summoner_id)
+    # if (try_league != []):
+    #     leagues = try_league[0]
+    #     summoner_league = leagues['tier'] + ' ' + leagues['rank']
+    #     points = leagues['leaguePoints']
+    #     wins = leagues['wins']
+    #     losses = leagues['losses']
+    #
+    #     if losses == 0:
+    #         if wins == 0:
+    #             rate = 0
+    #         else:
+    #             rate = 100
+    #     else:
+    #         rate = round(float(wins) / float(wins + losses) * 100, 2)
+
+    # match list
+    # need to store the list of recent matches in database
+
+
+
+    # return render(request, 'main\\search.html', {'search_value':search_value,
+    #                                        'summoner_info': summoner_info,
+    #                                        'name': summoner_info['name'],
+    #                                        'icon': summoner_info['profileIconId'],
+    #                                        'league': summoner_league,
+    #                                        'points': points,
+    #                                        'level': summoner_info['summonerLevel'],
+    #                                        'wins': wins,
+    #                                        'losses': losses,
+    #                                        'rate': rate,
+    #                                        'match_list': match_list})
+
+
+    return update(request, search_value)
+
+def home(request):
+    return render(request,'main\\search.html')
+
+
+def update(request, search_value):
+    watcher = RiotWatcher('RGAPI-bdf0d7e8-4bfe-4386-983e-78ba3767e454')
+    region = 'na1'
+    with open("main\\static\\chamList.txt") as json_data:
+        chamList = json.load(json_data)
+    ## handle non english name
+    try:
+        name = search_value.replace("%20", " ")
+
+        #summoner info
+        summoner_info = watcher.summoner.by_name(region, name)
+        acc_id = summoner_info["accountId"]
+        summoner_id = str(summoner_info['id'])
+        name = summoner_info["name"]
+
+        print("######### summoner info #########")
+        print(name)
+        #match info
+        match_list = []
+        matchlist = watcher.match.matchlist_by_account_recent(region, acc_id)
+        print("##### matchlist #####")
+        print(matchlist['matches'])
+        for match in matchlist['matches']:
+            matchId = match['gameId']
+            match_detail = watcher.match.by_id(region, matchId)
+
+            participantId = [participant['participantId'] for participant in match_detail['participantIdentities'] if
+                             participant['player']['summonerName'] == name][0]
+
+            participant = [participant for participant in match_detail['participants'] if
+                           participant['participantId'] == participantId][0]
+
+            itemkeys = ['item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6']
+            items = [participant['stats'][key] for key in itemkeys]
+            for item in items:
+                if item=='0':
+                    item = '3637'
+            doublekill = participant['stats']['doubleKills'] > 0
+            triplekill = participant['stats']['tripleKills'] > 0
+            quadrakill = participant['stats']['quadraKills'] > 0
+            pentakill = participant['stats']['pentaKills'] > 0
+            cId = participant['championId']
+
+
+            game_type = 'NA'
+
+
+            champion = chamList[str(cId)]
+            match_list.append({'champion': champion,
+                               'kills': participant['stats']['kills'],
+                               'deaths': participant['stats']['deaths'],
+                               'assists': participant['stats']['assists'],
+                               'win': participant['stats']['win'],
+                               'level': participant['stats']['champLevel'],
+                               'items': items,
+                               'penta': pentakill,
+                               'quadra': quadrakill,
+                               'triple': triplekill,
+                               'double': doublekill,
+                               'gameType': game_type,
+                               'match': match,
+                               'matchDetail': match_detail})
+        print("######### match info #########")
+        print(match_list == [])
+        #league info
+        summoner_league = 'Unranked'
+        points = 0
+        wins = 0
+        losses = 0
+        try_league = watcher.league.positions_by_summoner(region, summoner_id)
+        if (try_league != []):
+            leagues = try_league[0]
+            summoner_league = leagues['tier'] + ' ' + leagues['rank']
+            points = leagues['leaguePoints']
+            wins = leagues['wins']
+            losses = leagues['losses']
+
+            if losses == 0:
+                if wins == 0: rate = 0
+                else: rate = 100
+            else:
+                rate = round(float(wins)/float(wins+losses)*100, 2)
+        print("######### league info #########")
+        print(summoner_league)
+    except Exception as err:
+        print('This is the error')
+        print(str(err))
+
+    return render(request, 'main\\search.html', {'search_value':search_value,
+                                           'summoner_info': summoner_info,
+                                           'name': summoner_info['name'],
+                                           'icon': summoner_info['profileIconId'],
+                                           'league': summoner_league,
+                                           'points': points,
+                                           'level': summoner_info['summonerLevel'],
+                                           'wins': wins,
+                                           'losses': losses,
+                                           'rate': rate,
+                                           'match_list': match_list})

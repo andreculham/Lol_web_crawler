@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="\static\bootstrap-3.3.7-dist\css\bootstrap.min.css">
+    <script src="\static\node_modules\jquery\dist\jquery.js"></script>
+    <script src="\static\bootstrap-3.3.7-dist\js\bootstrap.js"></script>
+    <link href="\static\bootstrap-3.3.7-dist\css\bootstrap.css" rel="stylesheet">
+    <link href="\static\bootstrap-3.3.7-dist\css\bootstrap-theme.css" rel="stylesheet">
+    <link href="\static\bootstrap-3.3.7-dist\css\bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+
+      .panel-default > .panel-win {
+        background: #bbdefb;}
+      .panel-default > .panel-lose {
+        background: #ffcdd2;}
+    </style>
+    <title>Search</title>
+    <script type="text/javascript">
+        function handle(event){
+            if (event.keyCode == 13){
+                event.preventDefault();
+                submitsearchresult();
+            }
+        }
+
+        function submitsearchresult(){
+            console.log(document.getElementById("search").value == null);
+            console.log('here');
+            if(document.getElementById("search").value != "")
+                window.location.href = "/search/"+document.getElementById("search").value;
+        }
+
+        function updateresult(){
+            console.log(document.getElementById("search").value == null);
+            console.log('here');
+            if(document.getElementById("search").value != "")
+                window.location.href = "/update/"+document.getElementById("search").value;
+        }
+    </script>
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><b>FYP</b></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+
+                <div class="col-xs-11">
+                <form class="navbar-form">
+                    <div style="display:table;" class="input-group">
+                        <a onclick="submitsearchresult()" style="width: 10%;" class="input-group-addon btn btn-primary">
+                            <span class="glyphicon glyphicon-search"></span>Search
+                        </a>
+                        <input onkeypress="handle(event)" id = "search" type="text" autofocus="autofocus" autocomplete="off" placeholder="Search Here" name="search" style="height:30px;" value="{{search_value}}">
+                    </div>
+                </form>
+                </div>
+            </div>
+          </div>
+    </nav>
+    {% if search_value %}
+    {% if summoner_info %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-left">
+                    <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{icon}}.png" alt="image" width="100" height="100">
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading"><strong>{{ name }}</strong></h4>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="col-sm-2"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span><small class="text-muted"> &nbsp;Level{{level}}</small></div>
+                            <div class="col-sm-2"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span><small class="text-muted"> &nbsp;{{league}}</small></div>
+                            <div class="col-sm-2"><small class="text-muted"> &nbsp;{{points}}&nbsp;points</small></div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-primary" onclick="updateresult()">update</button>
+                        </div>
+                    </div>
+                    <p class="content">
+                        Ranked games: <br/>
+                        Win: {{ wins }}&nbsp;&nbsp;&nbsp;Lose: {{losses}}&nbsp;&nbsp;&nbsp;Win rate: {{rate}}%
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-group">
+        <h2 class="panel-heading"><strong>Recent 20 games</strong></h2>
+
+            {% for match in match_list%}
+                {% if match.win %}
+                <div class="panel panel-default">
+                    <div class="panel-body panel-win col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="row">
+
+                            <div class="col-sm-2">
+                                {{match.gameType}}
+                            </div>
+                            <div class="col-sm-2">
+                                <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/champion/{{match.champion}}.png" alt="image" width="50" height="50"/>
+                            </div>
+                            <div class="col-sm-2">
+                                K/D/A<br/>
+                                {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.0}}.png" alt="{{match.items.0}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.1}}.png" alt="{{match.items.1}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.2}}.png" alt="{{match.items.2}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.6}}.png" alt="{{match.items.6}}" width="40" height="40"/>
+                            </div>
+
+
+                        </div>
+                                <div class="row">
+
+                                    <div class="col-sm-2">
+                                        <p style="color:#64b5f6">Victory</p>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {{match.champion}}<br/>
+                                        Level{{match.level}}
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {% if match.penta %}
+                                        <button type="button" class="btn btn-danger disabled">Penta kill</button>
+
+                                        {% elif match.quadra %}
+                                        <button type="button" class="btn btn-danger disabled">quadra kill</button>
+
+                                        {% elif match.triple %}
+                                        <button type="button" class="btn btn-danger disabled">triple kill</button>
+
+                                        {% elif match.double %}
+                                        <button type="button" class="btn btn-danger disabled">Double kill</button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.3}}.png" alt="{{match.items.3}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.4}}.png" alt="{{match.items.4}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.5}}.png" alt="{{match.items.5}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                {% for player in match.matchDetail.participantIdentities %}
+                                {% if player.participantId < 6 %}
+
+                                <div class="row">
+                                    <a href="/search/{{player.player.summonerName}}">
+                                        <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                        <small class="text-muted"> {{player.player.summonerName}}</small>
+                                    </a>
+                                </div>
+
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="col-sm-2">
+                                {% for player in match.matchDetail.participantIdentities %}
+                                {% if player.participantId > 5 %}
+                                <div class="row">
+                                    <a href="/search/{{player.player.summonerName}}">
+                                        <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                        <small class="text-muted"> {{player.player.summonerName}}</small>
+                                    </a>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="panel panel-default">
+                    <div class="panel-body panel-lose col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="row">
+
+                            <div class="col-sm-2">
+                                {{match.gameType}}
+                            </div>
+                            <div class="col-sm-2">
+                                <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/champion/{{match.champion}}.png" alt="image" width="50" height="50"/>
+                            </div>
+                            <div class="col-sm-2">
+                                K/D/A<br/>
+                                {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.0}}.png" alt="{{match.items.0}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.1}}.png" alt="{{match.items.1}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.2}}.png" alt="{{match.items.2}}" width="40" height="40"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.6}}.png" alt="{{match.items.6}}" width="40" height="40"/>
+                            </div>
+
+                            </div>
+                                <div class="row">
+
+                                    <div class="col-sm-2">
+                                        <p style="color:#e57373;">Defeated</p>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {{match.champion}}<br/>
+                                        Level{{match.level}}
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {% if match.penta %}
+                                        <button type="button" class="btn btn-danger disabled">Penta kill</button>
+
+                                        {% elif match.quadra %}
+                                        <button type="button" class="btn btn-danger disabled">quadra kill</button>
+
+                                        {% elif match.triple %}
+                                        <button type="button" class="btn btn-danger disabled">triple kill</button>
+
+                                        {% elif match.double %}
+                                        <button type="button" class="btn btn-danger disabled">Double kill</button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.3}}.png" alt="{{match.items.3}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.4}}.png" alt="{{match.items.4}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <img class="img-rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.5}}.png" alt="{{match.items.5}}" width="40" height="40"/>
+                                    </div>
+                                    <div class="col-sm-1">
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2">
+                                        {% for player in match.matchDetail.participantIdentities %}
+                                        {% if player.participantId < 6 %}
+
+                                        <div class="row">
+                                            <a href="/search/{{player.player.summonerName}}">
+                                                <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                                <small class="text-muted"> {{player.player.summonerName}}</small>
+                                            </a>
+                                        </div>
+
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                            <div class="col-sm-2">
+                                        {% for player in match.matchDetail.participantIdentities %}
+                                        {% if player.participantId > 5 %}
+                                        <div class="row">
+                                            <a href="/search/{{player.player.summonerName}}">
+                                                <img class="img-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                                <small class="text-muted"> {{player.player.summonerName}}</small>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    {% endif %}
+    {% endif %}
+
+</body>
+</html>

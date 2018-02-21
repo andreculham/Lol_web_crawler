@@ -45,4 +45,7 @@ class ChampionDto(models.Model):
     active = models.BooleanField()
     freeToPlay = models.BooleanField()
     id = models.BigIntegerField(primary_key=True)
+
+
+
     
