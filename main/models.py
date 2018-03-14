@@ -5,7 +5,7 @@ import time
 class Match(models.Model):
     seasonId = models.IntegerField()
     queueId = models.IntegerField()
-    gameId = models.BigIntegerField()
+    gameId = models.BigIntegerField(primary_key=True)
     participantIdentities = JSONField()
     gameVersion = models.CharField(max_length=200)
     platformId = models.CharField(max_length=200)
@@ -25,11 +25,13 @@ class SummonerDTO(models.Model):
     revisionDate = models.BigIntegerField()
     id = models.BigIntegerField()
     accountId = models.BigIntegerField(primary_key=True)
+    matchList = JSONField()
+    analysis = JSONField()
 
 
 class ChampionMasteryDTO(models.Model):
     chestGranted = models.BooleanField()
-    championLevel = models.IntegerField()
+    championLevel = JSONField()
     championPoints = models.IntegerField()
     championId = models.BigIntegerField()
     playerId = models.BigIntegerField()
@@ -45,6 +47,23 @@ class ChampionDto(models.Model):
     active = models.BooleanField()
     freeToPlay = models.BooleanField()
     id = models.BigIntegerField(primary_key=True)
+
+class LeaguePositionDTO(models.Model):
+    rank = models.CharField(max_length=200)
+    queueType = models.CharField(max_length=200)
+    hotStreak = models.BooleanField()
+    wins = models.IntegerField()
+    veteran = models.BooleanField()
+    losses = models.IntegerField()
+    freshBlood = models.BooleanField()
+    leagueId = models.CharField(max_length=200)
+    playerOrTeamName = models.CharField(max_length=200)
+    inactive = models.BooleanField()
+    playerOrTeamId = models.CharField(max_length=200)
+    leagueName = models.CharField(max_length=200)
+    tier = models.CharField(max_length=200)
+    leaguePoints = models.IntegerField()
+
 
 
 
