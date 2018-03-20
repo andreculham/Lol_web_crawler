@@ -8,7 +8,7 @@ table, th, td {
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form method="post" action="/">
+<form method="post" action="/api_caller/">
 {% csrf_token %}
 Region:<select name="platformId">
 		{% for region in regions %}
@@ -23,7 +23,7 @@ Object type: <select name="objType">
 	</select>
 	<input type="submit" name="add" class="btn" value="ADD thread">
 </form>
-<form method="post" action="/">
+<form method="post" action="/api_caller/">
 {% csrf_token %}
 <table>
         <tr>

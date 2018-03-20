@@ -7,6 +7,7 @@ from requests import HTTPError
 from threading import Thread
 import threading
 import logging
+from django.conf import settings
 
 logging.basicConfig(level=logging.DEBUG,
                     format='(%(threadName)-9s) %(message)s',)
@@ -20,11 +21,11 @@ class ApiCaller(threading.Thread):
         self.objType = obj.objType
         self.event = threading.Event()
     def run(self):
-        watcher = RiotWatcher('RGAPI-037a581d-1a62-4dc6-9040-f6de10e853bf')
+        watcher = RiotWatcher(settings.API_KEY)
         region = self.region
         i= 2585564750
         while not self.event.is_set():
-            logging.debug('Waiting for a lock')
+            #logging.debug('Waiting for a lock')
             self.lock.acquire()
             #last object for platform id
             #obj = Match.objects.latest('gameId')
@@ -50,6 +51,6 @@ class ApiCaller(threading.Thread):
                 else:
                     print(self.getName() + ' ' +str(err))
             finally:
-                logging.debug('Released a lock')
+                #logging.debug('Released a lock')
                 self.lock.release()           
             i += 1

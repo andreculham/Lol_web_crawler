@@ -1,3 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+    <!-- MDBootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+
+    <style type="text/css">
+      .card-win {
+        background-color: #bbdefb;}
+      .card-lose {
+        background-color: #ffcdd2;}
+      .dataTables_filter input{
+         width:100px;
+      }
+
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+
+      }
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+      .no-gutters {
+          margin-right: 0;
+          margin-left: 0;
+
+        > .col,
+        > [class*="col-"] {
+            padding-right: 0;
+            padding-left: 0;
+         }
+      }
+
+
+    </style>
+    <title>Workload</title>
+    <script type="text/javascript">
+        function handle(event){
+            if (event.keyCode == 13){
+                event.preventDefault();
+                submitsearchresult();
+            }
+        }
+
+        function submitsearchresult(){
+            console.log(document.getElementById("search").value == null);
+            console.log('here');
+            if(document.getElementById("search").value != "")
+                window.location.href = "/search/"+"{{region}}"+"/"+document.getElementById("search").value;
+        }
+
+        function updateresult(){
+            console.log(document.getElementById("search").value == null);
+            console.log('here');
+            if(document.getElementById("search").value != "")
+                window.location.href = "/update/"+"{{region}}"+"/"+document.getElementById("search").value;
+            else
+                window.location.href = "/update/"+"{{region}}"+"/"+"{{search_value}}";
+        }
+
+        function submitregion(region){
+            window.location.href = "/search/"+region+"/"+"{{league}}"+"/"+"{{time}}"+"/";
+        }
+
+        $(document).ready(function() {
+            $('#mastery').DataTable({"lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
+                                        "dom":"<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+                                                "<'row'<'col-sm-12'tr>>" +
+                                                "<'row'<'col-sm-12 text-right'i>>" +
+                                                "<'row'<'col-sm-12 d-flex justify-content-center'p>>"});
+            $('.dataTables_filter input[type="search"]').css({'width':'100px','display':'inline-block'});
+        } );
+
+
+        function togglebutton() {
+
+            var league = "{{league}}"
+            var time = "{{time}}"
+            document.getElementById(league).disabled = true
+            document.getElementById(league).style.background = '#222222'
+            document.getElementById(league).style.color = '#eeeeee'
+            document.getElementById(time).disabled = true
+            document.getElementById(time).style.background ='#222222'
+            document.getElementById(time).style.color ='#eeeeee'
+        }
+
+        function submittime(time){
+            window.location.href = "/champions/"+"{{region}}"+"/"+"{{league}}"+"/"+time+"/";
+        }
+
+        function submitleague(league){
+            window.location.href = "/champions/"+"{{region}}"+"/"+league+"/"+"{{time}}"+"/";
+        }
+
+
+    </script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+        <a class="navbar-brand" href="#"><b>FYP</b></a>
+
+            <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                  <form class="form-inline">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <a onclick="submitsearchresult()" style="width: 100%; height: 40px;" class="btn btn-success">Search  </a>
+                        </div>
+
+                        <input class="form-control mr-sm-2" onkeypress="handle(event)" id = "search" type="text" autofocus="autofocus" autocomplete="off" placeholder="Search Here" name="search" style="height:40px;" value="{{search_value}}">
+                    </div>
+                </form>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button">  {{region}}  <span class="caret"></span></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"><a onclick="submitregion('NA1')">NA1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('KR')">KR</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('EUN1')">EUN1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('EUW1')">EUW1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('JP1')">JP1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('RU')">RU</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('BR1')">BR1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('OC1')">OC1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('TR1')">TR1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('LA1')">LA1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('LA2')">LA2</a></a>
+                    </div>
+              </li>
+                <li class="nav-item"><a class="nav-link" href="/search/{{region}}/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/champions/{{region}}/">Champions</a></li>
+                <li class="nav-item"><a class="nav-link" href="/index/">Index</a></li>
+                <li class="nav-item"><a class="nav-link" href="/workload/">Workload</a></li>
+
+            </ul>
+
+            </div>
+
+    </nav>
+<div class = "container-fluid">
 {% if total_match_len %}
 	Total number of matches = {{ total_match_len }}
 {% endif %}
@@ -22,3 +190,6 @@ To:<input type="datetime-local" id="endTime" name="endTime" placeholder="End Tim
 	Matches :
 	<p> No matches found. </p>
 {% endif %}
+    </div>
+</body>
+</html>

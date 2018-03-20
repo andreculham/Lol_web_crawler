@@ -1,24 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	{% load static %}
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="\static\bootstrap-3.3.7-dist\css\bootstrap.min.css">
-    <script src="{% static 'node_modules\jquery\dist\jquery.js' %}"></script>
-    <script src="{% static 'bootstrap-3.3.7-dist\js\bootstrap.js' %}"></script>
-    <link href="{% static 'bootstrap-3.3.7-dist\css\bootstrap.css' %}" rel="stylesheet">
-    <link href="{% static 'bootstrap-3.3.7-dist\css\bootstrap-theme.css' %}" rel="stylesheet">
-    <link href="{% static 'bootstrap-3.3.7-dist\css\bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+    <!-- MDBootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+
     <style type="text/css">
+      .card-win {
+        background-color: #bbdefb;}
+      .card-lose {
+        background-color: #ffcdd2;}
+      .dataTables_filter input{
+         width:100px;
+      }
+
       body {
         padding-top: 60px;
         padding-bottom: 40px;
 
       }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-
       @media (max-width: 980px) {
         /* Enable use of floated navbar text */
         .navbar-text.pull-right {
@@ -27,11 +45,18 @@
           padding-right: 5px;
         }
       }
+      .no-gutters {
+          margin-right: 0;
+          margin-left: 0;
 
-      .panel-default > .panel-win {
-        background: #bbdefb;}
-      .panel-default > .panel-lose {
-        background: #ffcdd2;}
+        > .col,
+        > [class*="col-"] {
+            padding-right: 0;
+            padding-left: 0;
+         }
+      }
+
+
     </style>
     <title>Search</title>
     <script type="text/javascript">
@@ -46,274 +71,419 @@
             console.log(document.getElementById("search").value == null);
             console.log('here');
             if(document.getElementById("search").value != "")
-                window.location.href = "/search/"+document.getElementById("search").value;
+                window.location.href = "/search/"+"{{region}}"+"/"+document.getElementById("search").value;
         }
+
+        function updateresult(){
+            console.log(document.getElementById("search").value == null);
+            console.log('here');
+            if(document.getElementById("search").value != "")
+                window.location.href = "/update/"+"{{region}}"+"/"+document.getElementById("search").value;
+            else
+                window.location.href = "/update/"+"{{region}}"+"/"+"{{search_value}}";
+        }
+
+        function submitregion(region){
+            window.location.href = "/search/"+region+"/"+"{{league}}"+"/"+"{{time}}"+"/";
+        }
+
+        $(document).ready(function() {
+            $('#mastery').DataTable({"lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
+                                        "dom":"<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+                                                "<'row'<'col-sm-12'tr>>" +
+                                                "<'row'<'col-sm-12 text-right'i>>" +
+                                                "<'row'<'col-sm-12 d-flex justify-content-center'p>>"});
+            $('.dataTables_filter input[type="search"]').css({'width':'100px','display':'inline-block'});
+        } );
+
+
+        function togglebutton() {
+
+            var league = "{{league}}"
+            var time = "{{time}}"
+            document.getElementById(league).disabled = true
+            document.getElementById(league).style.background = '#222222'
+            document.getElementById(league).style.color = '#eeeeee'
+            document.getElementById(time).disabled = true
+            document.getElementById(time).style.background ='#222222'
+            document.getElementById(time).style.color ='#eeeeee'
+        }
+
+        function submittime(time){
+            window.location.href = "/champions/"+"{{region}}"+"/"+"{{league}}"+"/"+time+"/";
+        }
+
+        function submitleague(league){
+            window.location.href = "/champions/"+"{{region}}"+"/"+league+"/"+"{{time}}"+"/";
+        }
+
+
     </script>
 </head>
 <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#"><b>FYP</b></a>
-            </div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+        <a class="navbar-brand" href="#"><b>FYP</b></a>
+
             <div id="navbar" class="navbar-collapse collapse">
 
-                <div class="col-xs-11">
-                <form class="navbar-form">
-                    <div style="display:table;" class="input-group">
-                        <a onclick="submitsearchresult()" style="width: 10%;" class="input-group-addon btn btn-primary">
-                            <span class="glyphicon glyphicon-search"></span>Search
-                        </a>
-                        <input onkeypress="handle(event)" id = "search" type="text" autofocus="autofocus" autocomplete="off" placeholder="Search Here" name="search" style="height:30px;" value="{{search_value}}">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                  <form class="form-inline">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <a onclick="submitsearchresult()" style="width: 100%; height: 40px;" class="btn btn-success">Search  </a>
+                        </div>
+
+                        <input class="form-control mr-sm-2" onkeypress="handle(event)" id = "search" type="text" autofocus="autofocus" autocomplete="off" placeholder="Search Here" name="search" style="height:40px;" value="{{search_value}}">
                     </div>
                 </form>
-                </div>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button">  {{region}}  <span class="caret"></span></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"><a onclick="submitregion('NA1')">NA1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('KR')">KR</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('EUN1')">EUN1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('EUW1')">EUW1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('JP1')">JP1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('RU')">RU</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('BR1')">BR1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('OC1')">OC1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('TR1')">TR1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('LA1')">LA1</a></a>
+                        <a class="dropdown-item"><a onclick="submitregion('LA2')">LA2</a></a>
+                    </div>
+              </li>
+                <li class="nav-item"><a class="nav-link" href="/search/{{region}}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/champions/{{region}}">Champions</a></li>
+
+            </ul>
+
             </div>
           </div>
     </nav>
+<div class = "container-fluid">
+
+    {% if error %}
+    <div>Error occurs</div>
+    {% elif notfound %}
+    <div>User not found, try update</div>
+    <button type="button" class="btn btn-primary" onclick="updateresult()">update</button>
+    {% else %}
     {% if search_value %}
     {% if summoner_info %}
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="media">
-                <div class="media-left">
-                    <img class="img-circle" src="{% static 'img\profileicon\{{icon}}.png' %}" alt="image" width="100" height="100">
-                </div>
-                <div class="media-body">
-                    <h4 class="media-heading"><strong>{{ name }}</strong></h4>
-                    <div class="row">
-                        <div class="col-sm-9">
-                            <div class="col-sm-2"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span><small class="text-muted"> &nbsp;Level{{level}}</small></div>
-                            <div class="col-sm-2"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span><small class="text-muted"> &nbsp;{{league}}</small></div>
-                            <div class="col-sm-2"><small class="text-muted"> &nbsp;{{points}}&nbsp;points</small></div>
 
+    <div class="card border-primary" style="width:750px">
+    <div class="card-body">
+    <div class="row">
+        <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{icon}}.png" alt="image" width="100" height="100">
+                    </div>
+
+                    <div class="col-sm-8">
+                        <div class="row">
+                            <div class="col-sm-6"><h4 class="card-title"><strong>{{ name }}</strong></h4></div>
+                            <div class="col-sm-6">
+                                    <button type="button" class="btn btn-primary" onclick="updateresult()">update</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <small class="text-muted"> Level &nbsp;{{level}}&nbsp;&nbsp;&nbsp;{{league}}&nbsp;&nbsp;&nbsp;{{points}}&nbsp;points</small>
+                        </div>
+                        <div class="row">
+                            <small class="text-muted">
+                                Ranked games: <br/>
+                                Win: {{ wins }}&nbsp;&nbsp;&nbsp;Lose: {{losses}}&nbsp;&nbsp;&nbsp;Win rate: {{rate}}%
+                            </small>
                         </div>
                     </div>
-                    <p class="content">
-                        Ranked games: <br/>
-                        Win: {{ wins }}&nbsp;&nbsp;&nbsp;Lose: {{losses}}&nbsp;&nbsp;&nbsp;Win rate: {{rate}}%
-                    </p>
+                </div>
+        </div>
+        <div class="col-sm-6">
 
+                <canvas id="radarChart" style="max-width: 500px;"></canvas>
+                <script>
+                    var ctxR = document.getElementById("radarChart").getContext('2d');
+                    var myRadarChart = new Chart(ctxR, {
+                        type: 'radar',
+                        data: {
+                            labels: ["Carry", "Teamwork", "Support", "Farm", "Survive", "All-rounder"],
+                            datasets: [
+                                {
+                                    label: "Role analysis",
+                                    backgroundColor : "rgba(54, 162, 235, 0.2)",
+                                    borderWidth : 2,
+                                    borderColor : "rgba(54, 162, 235, 0.8)",
+                                    pointBackgroundColor : "rgba(54, 162, 235, 1)",
+                                    pointBorderColor : "#fff",
+                                    pointBorderWidth : 1,
+                                    pointRadius : 4,
+                                    pointHoverBackgroundColor : "#fff",
+                                    pointHoverBorderColor : "rgba(54, 162, 235, 1)",
+                                    data: [{{analysis.carry}},{{analysis.teamwork}},{{analysis.support}},{{analysis.farm}},{{analysis.survive}},{{analysis.allrounder}}]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    });
+                </script>
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+<br/>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card border-secondary">
+                <div class="card-header"><strong>Champion Masteries</strong></div>
+                <div class="card-body text-secondary">
+                    <table id="mastery" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Icon</th>
+                <th>Champion</th>
+                <th>Level</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for mastery in mastery_list %}
+            <tr>
+                <td><img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/champion/{{mastery.champion}}.png" alt="image" width="40" height="40"></td>
+                <td>{{mastery.champion}}</td>
+                <td>Level&nbsp;{{mastery.championLevel}}</td>
+                <td>{{mastery.championPoints}}</td>
+
+            </tr>
+        {% endfor %}
+        </tbody></table>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="panel-group">
-        <h2 class="panel-heading"><strong>Recent 20 games</strong></h2>
+        <div class="col-sm">
+            <div class="card border-secondary">
+                <div class="card-header"><strong>Recent games</strong></div>
+                  <ul class="list-group list-group-flush">
+                      {% for match in match_list%}
+                      <li class="list-group-item">
 
-            {% for match in match_list%}
-                {% if match.win %}
-                <div class="panel panel-default">
-                    <div class="panel-body panel-win col-sm-9">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="row">
+                        {% if match.win %}
+                        <div class="card-body card-win">
+                            <div class="row d-flex justify-content-center align-items-center">
+                                <div class="col-sm-8 ">
+                                    <div class="row">
 
-                            <div class="col-sm-2">
-                                {{match.gameType}}
-                            </div>
-                            <div class="col-sm-2">
-                                <img class="img-circle" src="{% static 'img\champion\{{match.champion}}.png' %}" alt="image" width="50" height="50"/>
-                            </div>
-                            <div class="col-sm-2">
-                                K/D/A<br/>
-                                {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.0}}.png' %}" alt="{{match.items.0}}" width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.1}}.png' %}" alt="{{match.items.1}}" width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.2}}.png' %}" alt="{{match.items.2}}" width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.6}}.png' %}" alt="{{match.items.6}}" width="40" height="40"/>
-                            </div>
-
-
-                        </div>
-                                <div class="row">
-
-                                    <div class="col-sm-2">
-                                        <p style="color:#64b5f6">Victory</p>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        {{match.champion}}<br/>
-                                        Level{{match.level}}
-                                    </div>
-                                    <div class="col-sm-2">
-                                        {% if match.penta %}
-                                        <button type="button" class="btn btn-danger disabled">Penta kill</button>
-
-                                        {% elif match.quadra %}
-                                        <button type="button" class="btn btn-danger disabled">quadra kill</button>
-
-                                        {% elif match.triple %}
-                                        <button type="button" class="btn btn-danger disabled">triple kill</button>
-
-                                        {% elif match.double %}
-                                        <button type="button" class="btn btn-danger disabled">Double kill</button>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.3}}.png' %}" alt="{{match.items.3}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.4}}.png' %}" alt="{{match.items.4}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.5}}.png' %}" alt="{{match.items.5}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
+                                        <div class="col-sm-2 text-center">
+                                            {{match.gameType}}<br/><small class="text-muted"> {{match.duration}}</small>
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/champion/{{match.champion}}.png" alt="image" width="50" height="50"/>
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            K/D/A<br/>
+                                            {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.0}}.png" alt="{{match.items.0}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.1}}.png" alt="{{match.items.1}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.2}}.png" alt="{{match.items.2}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.6}}.png" alt="{{match.items.6}}" width="40" height="40"/>
+                                        </div>
                                     </div>
 
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                {% for player in match.match.detail.participantIdentities %}
-                                {% if player.participantId < 6 %}
+                                    <div class="row">
+                                        <div class="col-sm-2 text-center">
+                                            <p style="color:#64b5f6">Victory</p>
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            {{match.champion}}<br/>
+                                            Level{{match.level}}
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            {% if match.penta %}
+                                            <span class="badge badge-danger">Penta kill</span>
 
-                                <div class="row">
-                                    <a href="/search/{{player.player.summonerName}}">
-                                        <img class="img-circle" src="{% static 'img\profileicon\{{player.player.profileIcon}}.png' %}" alt="image" width="20" height="20"/>
-                                        <small class="text-muted"> {{player.player.summonerName}}</small>
-                                    </a>
-                                </div>
+                                            {% elif match.quadra %}
+                                            <span class="badge badge-danger">quadra kill</span>
 
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="col-sm-2">
-                                {% for player in match.match.detail.participantIdentities %}
-                                {% if player.participantId > 5 %}
-                                <div class="row">
-                                    <a href="/search/{{player.player.summonerName}}">
-                                        <img class="img-circle" src="{% static 'img\profileicon\{{player.player.profileIcon}}.png' %}" alt="image" width="20" height="20"/>
-                                        <small class="text-muted"> {{player.player.summonerName}}</small>
-                                    </a>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
+                                            {% elif match.triple %}
+                                            <span class="badge badge-danger">triple kill</span>
 
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="panel panel-default">
-                    <div class="panel-body panel-lose col-sm-9">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="row">
-
-                            <div class="col-sm-2">
-                                {{match.gameType}}
-                            </div>
-                            <div class="col-sm-2">
-                                <img class="img-circle" src="{% static 'img\champion\{{match.champion}}.png' %}" alt="image" width="50" height="50"/>
-                            </div>
-                            <div class="col-sm-2">
-                                K/D/A<br/>
-                                {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.0}}.png' %}" alt="{{match.items.0}}"  width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.1}}.png' %}" alt="{{match.items.1}}" width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.2}}.png' %}" alt="{{match.items.2}}" width="40" height="40"/>
-                            </div>
-                            <div class="col-sm-1">
-                                <img class="img-rounded" src="{% static 'img\item\{{match.items.6}}.png' %}" alt="{{match.items.6}}" width="40" height="40"/>
-                            </div>
-
-                            </div>
-                                <div class="row">
-
-                                    <div class="col-sm-2">
-                                        <p style="color:#e57373;">Defeated</p>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        {{match.champion}}<br/>
-                                        Level{{match.level}}
-                                    </div>
-                                    <div class="col-sm-2">
-                                        {% if match.penta %}
-                                        <button type="button" class="btn btn-danger disabled">Penta kill</button>
-
-                                        {% elif match.quadra %}
-                                        <button type="button" class="btn btn-danger disabled">quadra kill</button>
-
-                                        {% elif match.triple %}
-                                        <button type="button" class="btn btn-danger disabled">triple kill</button>
-
-                                        {% elif match.double %}
-                                        <button type="button" class="btn btn-danger disabled">Double kill</button>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.3}}.png' %}" alt="{{match.items.3}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.4}}.png' %}" alt="{{match.items.4}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <img class="img-rounded" src="{% static 'img\item\{{match.items.5}}.png' %}" alt="{{match.items.5}}" width="40" height="40"/>
-                                    </div>
-                                    <div class="col-sm-1">
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="col-sm-2">
-                                        {% for player in match.match.detail.participantIdentities %}
-                                        {% if player.participantId < 6 %}
-
-                                        <div class="row">
-                                            <a href="/search/{{player.player.summonerName}}">
-                                                <img class="img-circle" src="{% static 'img\profileicon\{{player.player.profileIcon}}.png' %}" alt="image" width="20" height="20"/>
-                                                <small class="text-muted"> {{player.player.summonerName}}</small>
-                                            </a>
+                                            {% elif match.double %}
+                                            <span class="badge badge-danger">Double kill</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.3}}.png" alt="{{match.items.3}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.4}}.png" alt="{{match.items.4}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.5}}.png" alt="{{match.items.5}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
                                         </div>
 
-                                        {% endif %}
-                                        {% endfor %}
                                     </div>
-                            <div class="col-sm-2">
-                                        {% for player in match.match.detail.participantIdentities %}
-                                        {% if player.participantId > 5 %}
-                                        <div class="row">
-                                            <a href="/search/{{player.player.summonerName}}">
-                                                <img class="img-circle" src="{% static 'img\profileicon\{{player.player.profileIcon}}.png' %}" alt="image" width="20" height="20"/>
-                                                <small class="text-muted"> {{player.player.summonerName}}</small>
-                                            </a>
-                                        </div>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </div>
-                        </div>
-                    </div>
-                {% endif %}
+                                </div>
+                                <div class="col-sm-2">
+                                    {% for player in match.matchDetail.participantIdentities %}
+                                    {% if player.participantId <= match.teamSize %}
 
-            </div>
-            {% endfor %}
+                                    <div class="row">
+                                        <a href="/search/{{region}}/{{player.player.summonerName}}">
+                                            <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                            <small class="text-muted"> {{player.player.summonerName}}</small>
+                                        </a>
+                                    </div>
+
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-sm-2">
+                                    {% for player in match.matchDetail.participantIdentities %}
+                                    {% if player.participantId > match.teamSize %}
+                                    <div class="row">
+                                        <a href="/search/{{region}}/{{player.player.summonerName}}">
+                                            <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                            <small class="text-muted"> {{player.player.summonerName}}</small>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="card-body card-lose">
+                            <div class="row d-flex justify-content-center align-items-center">
+                                <div class="col-sm-8">
+                                    <div class="row">
+
+                                <div class="col-sm-2 text-center">
+                                    {{match.gameType}}<br/><small class="text-muted"> {{match.duration}}</small>
+                                </div>
+                                <div class="col-sm-2 text-center">
+                                    <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/champion/{{match.champion}}.png" alt="image" width="50" height="50"/>
+                                </div>
+                                <div class="col-sm-2 text-center">
+                                    K/D/A<br/>
+                                    {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
+                                </div>
+                                <div class="col-sm-1">
+                                    <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.0}}.png" alt="{{match.items.0}}" width="40" height="40"/>
+                                </div>
+                                <div class="col-sm-1">
+                                    <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.1}}.png" alt="{{match.items.1}}" width="40" height="40"/>
+                                </div>
+                                <div class="col-sm-1">
+                                    <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.2}}.png" alt="{{match.items.2}}" width="40" height="40"/>
+                                </div>
+                                <div class="col-sm-1">
+                                    <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.6}}.png" alt="{{match.items.6}}" width="40" height="40"/>
+                                </div>
+
+                                </div>
+                                    <div class="row">
+
+                                        <div class="col-sm-2 text-center">
+                                            <p style="color:#e57373;">Defeated</p>
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            {{match.champion}}<br/>
+                                            Level{{match.level}}
+                                        </div>
+                                        <div class="col-sm-2 text-center">
+                                            {% if match.penta %}
+                                            <span class="badge badge-danger">Penta kill</span>
+
+                                            {% elif match.quadra %}
+                                            <span class="badge badge-danger">quadra kill</span>
+
+                                            {% elif match.triple %}
+                                            <span class="badge badge-danger">triple kill</span>
+
+                                            {% elif match.double %}
+                                            <span class="badge badge-danger">Double kill</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.3}}.png" alt="{{match.items.3}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.4}}.png" alt="{{match.items.4}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <img class="rounded" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/item/{{match.items.5}}.png" alt="{{match.items.5}}" width="40" height="40"/>
+                                        </div>
+                                        <div class="col-sm-1">
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2">
+                                            {% for player in match.matchDetail.participantIdentities %}
+                                            {% if player.participantId <= match.teamSize %}
+
+                                            <div class="row">
+                                                <a href="/search/{{region}}/{{player.player.summonerName}}">
+                                                    <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                                    <small class="text-muted"> {{player.player.summonerName}}</small>
+                                                </a>
+                                            </div>
+
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                <div class="col-sm-2">
+                                            {% for player in match.matchDetail.participantIdentities %}
+                                            {% if player.participantId > match.teamSize %}
+                                            <div class="row">
+                                                <a href="/search/{{region}}/{{player.player.summonerName}}">
+                                                    <img class="rounded-circle" src="http://ddragon.leagueoflegends.com/cdn/8.3.1/img/profileicon/{{player.player.profileIcon}}.png" alt="image" width="20" height="20"/>
+                                                    <small class="text-muted"> {{player.player.summonerName}}</small>
+                                                </a>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        </li>
+                  {% endfor %}
+                  </ul>
+
+
         </div>
     </div>
 
 
     {% endif %}
     {% endif %}
+    {% endif %}
+</div>
+</div>
+
 
 </body>
 </html>

@@ -16,6 +16,8 @@ class Match(models.Model):
     participants = JSONField()
     gameDuration = models.BigIntegerField()
     gameCreation = models.BigIntegerField()
+    league = models.CharField(max_length=200)
+    region = models.CharField(max_length=200)
 
 
 class SummonerDTO(models.Model):
@@ -25,6 +27,9 @@ class SummonerDTO(models.Model):
     revisionDate = models.BigIntegerField()
     id = models.BigIntegerField()
     accountId = models.BigIntegerField(primary_key=True)
+    matchList = JSONField()
+    analysis = JSONField()
+    region = models.CharField(max_length=200)
 
 
 class ChampionMasteryDTO(models.Model):
@@ -37,12 +42,31 @@ class ChampionMasteryDTO(models.Model):
     tokensEarned = models.IntegerField()
     championPointsSinceLastLevel = models.BigIntegerField()
     lastPlayTime = models.BigIntegerField()
+    region = models.CharField(max_length=200)
 
 class ChampionDto(models.Model):
-    rankedPlayEnabled = models.BooleanField()
-    botEnabled = models.BooleanField()
-    botMmEnabled = models.BooleanField()
-    active = models.BooleanField()
-    freeToPlay = models.BooleanField()
     id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=200)
+    win = models.IntegerField()
+    played = models.IntegerField()
+    kda = JSONField()
+    gold = models.IntegerField()
+
+class LeaguePositionDTO(models.Model):
+    rank = models.CharField(max_length=200)
+    queueType = models.CharField(max_length=200)
+    hotStreak = models.BooleanField()
+    wins = models.IntegerField()
+    veteran = models.BooleanField()
+    losses = models.IntegerField()
+    freshBlood = models.BooleanField()
+    leagueId = models.CharField(max_length=200)
+    playerOrTeamName = models.CharField(max_length=200)
+    inactive = models.BooleanField()
+    playerOrTeamId = models.CharField(max_length=200)
+    leagueName = models.CharField(max_length=200)
+    tier = models.CharField(max_length=200)
+    leaguePoints = models.IntegerField()
+    region = models.CharField(max_length=200)
+
     

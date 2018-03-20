@@ -1,4 +1,4 @@
-
+API_KEY = 'RGAPI-f4ddc276-0205-4d34-858d-36f60fab858c'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '9@!m5^f+gj+nd8ix)g2yz-&tv6#u_$54#wu#6cc)mhhd%1a*rc'
 
